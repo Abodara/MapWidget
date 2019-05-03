@@ -8,9 +8,9 @@ class LeMondeWidget extends Widget {
 		super.setUp();
 		this.header = true;
 		this.footer = true;
-		this.sizeX = 2;
-		this.sizeY = 1;
-		this.radius = 15;
+		this.sizeX = 3;
+		this.sizeY = 2;
+		this.radius = 2;
 	}
 	
 	async ready() {
@@ -40,29 +40,48 @@ class LeMondeView extends WidgetView {
 	
 	constructor() {
 		super();
+		this.map = HH.create("div");
+		this.map.id = "map";
 	}
 	
 	setUp() {
 		super.setUp();
-		
+		L.mapquest.key = '3DD7MsUFRtG32ShoNDBFYeVsd9gZFK1u';
 	}
 
 	draw() {
 		super.draw();
-		this.link = HH.create("a");
-		SS.style(this.link, {"fontSize": "10px", "textDecoration": "none"});
-		this.stage.appendChild(this.link);
+		this.map = document.getElementById("map");
+		var parent = map.parentNode;
+		parent.replaceChild(this.stage,this.map);
+		this.editer = HH.create("div");
+		this.research = HH.create("input");
+		this.editer.appendChild(this.research);
+		this.button = HH.create("button");
+		this.button.textContent = "OK";
+		this.button.addEventListener("click",() => this.update());
+		SS.style(this.editer,{"position":"relative","height":"100%","width":"100%"});
+		SS.style(this.button,{"position": "absolute","top":"0px","right":"0px","height":"100%", "width":"20%"});
+		SS.style(this.research,{"position": "absolute","top":"0px","left":"0px","height":"100%","width":"75%"});
 		
-		this.try.footer.innerHTML = "test socket";
-		SS.style(this.try.footer, {"userSelect": "none", "cursor": "pointer"});
-		Events.on(this.try.footer, "click", event => this.mvc.controller.socketClick());
-		this.try.stage.appendChild(this.try.footer);
+		this.editer.appendChild(this.button);
+		this.footer.textContent = '';
+		this.stage.appendChild(this.map);
+		this.footer.appendChild(this.editer);
+		this.map = L.mapquest.map('map', {
+          center: [37.7749, -122.4194],
+          layers: L.mapquest.tileLayer('map'),
+          zoom: 12
+        });
+
+        this.map.addControl(L.mapquest.control());
 	}
 	
-	update(title, link) {
-		this.link.innerHTML = title;
-		HH.attr(this.link, {"href": "https://www.lemonde.fr" + link, "target": "_blank"});
+	update() {
+		let val = this.research.value;
+		L.mapquest.geocoding().geocode(val);
 	}
+
 	
 }
 
